@@ -1,9 +1,9 @@
 # RenderDeck — landing page
 
-The public landing page for [RenderDeck](https://github.com/zenmastertv/renderdeck),
+The public landing page for [RenderDeck],
 a self-contained render manager for Unreal Engine.
 
-Live at **https://zenmastertv.github.io/renderdeck-unreal/**
+Live at **https://github.com/zenmastertv/renderdeck-unreal**
 
 ## What is in here
 
