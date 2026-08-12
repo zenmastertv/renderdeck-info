@@ -1,0 +1,27 @@
+# RenderDeck — landing page
+
+The public landing page for [RenderDeck](https://github.com/zenmastertv/renderdeck),
+a self-contained render manager for Unreal Engine.
+
+Live at **https://zenmastertv.github.io/renderdeck-unreal/**
+
+## What is in here
+
+Static files only. No build step, no dependencies, no server.
+
+```
+index.html      the page, including the inline pre-paint theme script
+styles.css      all styling, light and dark tokens
+assets/         mark, app icon and favicons
+.nojekyll       serve the files as-is, skip Jekyll processing
+```
+
+## Working on it
+
+Open `index.html` directly, or serve the folder if you want a real origin:
+
+```bash
+python3 -m http.server 8080
+```
+
+Pushing to `main` republishes the site.

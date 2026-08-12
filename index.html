@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<!--
+  RenderDeck — public landing page.
+
+  A standalone static page: this folder is the whole website. It is not served by
+  server.py and the app does not depend on it. Open index.html or drop the folder
+  on any static host. Styling lives in styles.css next to this file. The DEMO and
+  DOWNLOAD links are marked with comments below.
+-->
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0d14">
+  <title>RenderDeck · Render manager for Unreal Engine</title>
+  <meta name="description" content="RenderDeck is a self-contained render manager for Unreal Engine. Submit shots, dispatch them across a worker fleet, and let them render unattended.">
+
+  <!-- Brand icons, copied from the repo's icons/ folder into ./assets -->
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="assets/renderdeck-app-icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/renderdeck-favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/renderdeck-favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/renderdeck-app-icon-180.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    // Remembered theme, applied before first paint so there is no flash.
+    (function () {
+      var t = localStorage.getItem('rd_theme') || 'dark';
+      document.documentElement.classList.toggle('dark', t === 'dark');
+      document.documentElement.classList.toggle('light', t !== 'dark');
+    })();
+  </script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- ══ Top bar ══════════════════════════════════════════════════ -->
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="./" aria-label="RenderDeck home">
+        <img class="mark d" src="assets/renderdeck-mark-dark.svg" alt="" width="34" height="34">
+        <img class="mark l" src="assets/renderdeck-mark-light.svg" alt="" width="34" height="34">
+        <div class="wordmark"><span>Render</span><b>Deck</b></div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#pipeline">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#quickstart">Quickstart</a>
+      </nav>
+
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/>
+        </svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M20 14.4A8.2 8.2 0 1 1 9.6 4a6.6 6.6 0 0 0 10.4 10.4Z"/>
+        </svg>
+      </button>
+
+      <a class="icon-btn" href="https://github.com/zenmastertv/renderdeck" target="_blank" rel="noopener" aria-label="RenderDeck on GitHub" title="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 1.8a10.2 10.2 0 0 0-3.22 19.88c.5.1.69-.22.69-.48v-1.87c-2.84.62-3.44-1.2-3.44-1.2-.46-1.18-1.13-1.5-1.13-1.5-.93-.63.07-.62.07-.62 1.02.07 1.56 1.05 1.56 1.05.9 1.56 2.37 1.11 2.95.85.09-.66.35-1.11.64-1.37-2.27-.26-4.65-1.14-4.65-5.06 0-1.12.4-2.03 1.05-2.75-.11-.26-.46-1.3.1-2.71 0 0 .86-.28 2.8 1.05a9.7 9.7 0 0 1 5.1 0c1.94-1.33 2.79-1.05 2.79-1.05.56 1.41.21 2.45.1 2.71.65.72 1.05 1.63 1.05 2.75 0 3.93-2.39 4.79-4.66 5.05.36.32.68.94.68 1.9v2.82c0 .27.18.59.7.48A10.2 10.2 0 0 0 12 1.8Z"/>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ══ Hero ═════════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="grid"></div>
+      <div class="glow glow-1"></div>
+      <div class="glow glow-2"></div>
+    </div>
+
+    <div class="wrap hero-inner">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> Render manager for Unreal Engine</div>
+
+        <h1>Deal out the shots.<br><span class="grad-text">Render the whole deck.</span></h1>
+
+        <p class="lede">
+          RenderDeck is a <strong>self-contained render manager</strong> for Unreal Engine.
+          Submit a sequence, a level and a pipeline preset; RenderDeck queues the job, sends it
+          to the next free machine and renders it with <strong>Movie Render Queue</strong>, with
+          live progress, failure detection and a report on every finished shot.
+        </p>
+
+        <div class="cta-row">
+          <!-- DEMO link — point this at your demo server (see README.md) -->
+          <a class="btn btn-primary" href="http://localhost:6789/">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2c0-.86.94-1.4 1.68-.96l9.1 5.4a1.12 1.12 0 0 1 0 1.93l-9.1 5.4A1.12 1.12 0 0 1 8 15.99Z"/></svg>
+            Demo
+          </a>
+          <!-- DOWNLOAD link — the release you want people to grab -->
+          <a class="btn btn-ghost" href="https://github.com/zenmastertv/renderdeck/releases/latest">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.4v11.3M7.4 10.4l4.6 4.6 4.6-4.6M4.4 19.4h15.2"/>
+            </svg>
+            Download
+          </a>
+          <!-- DOWNLOAD link — the release you want people to grab -->
+          <a class="btn btn-ghost" href="https://github.com/zenmastertv/renderdeck/releases/latest">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 4.4h5.2v5.2M19.2 4.4L10 13.6M15.4 12.8v5.4a1.4 1.4 0 01-1.4 1.4H5.8a1.4 1.4 0 01-1.4-1.4V8a1.4 1.4 0 011.4-1.4h5.4"/>
+            </svg>
+            Sample
+          </a>
+        </div>
+
+        <p class="cta-note">
+          <span class="line">Free, open and self-hosted. One command to run.</span>
+
+          <span class="line">Sample link contains a minimal example project in Unreal. Please follow the included <code>guide.pdf</code> on how to run it.</span>
+
+        </p>
+      </div>
+
+      <!-- Product visual -->
+      <div class="visual">
+        <div class="float-mark" aria-hidden="true">
+          <img class="d" src="assets/renderdeck-mark-dark.svg" alt="">
+          <img class="l" src="assets/renderdeck-mark-light.svg" alt="">
+        </div>
+
+        <div class="panel" role="img" aria-label="Illustration of the RenderDeck job queue with four workers rendering shots">
+          <div class="panel-head">
+            <div class="lights"><i></i><i></i><i></i></div>
+            <div class="title">QUEUE · SC_0120</div>
+            <div class="sub">4 workers online</div>
+          </div>
+
+          <!-- One rendering, one waiting, one landed. The first two are driven by
+               the script at the end of the page: the render finishes, the queued
+               job takes the freed worker, then the panel starts over. -->
+          <div class="job" data-mock="a">
+            <div class="name">SC_0120_Shot_0030_v0004</div>
+            <div class="pill render">Rendering</div>
+            <div class="meta">RenderNode-01 · ACES_4K</div>
+            <div class="bar a"><i></i></div>
+          </div>
+
+          <div class="job" data-mock="b">
+            <div class="name">SC_0120_Shot_0050_v0001</div>
+            <div class="pill queued">Queued</div>
+            <div class="meta">priority 8 · Proxy · waiting for a worker</div>
+            <div class="bar b is-idle"><i></i></div>
+          </div>
+
+          <div class="job">
+            <div class="name">SC_0120_Shot_0020_v0003</div>
+            <div class="pill done">Success</div>
+            <div class="meta">RenderNode-04 · ACES_4K · 21m 04s</div>
+          </div>
+
+          <div class="workers">
+            <span class="chip"><i class="led"></i>RenderNode-01</span>
+            <span class="chip"><i class="led"></i>RenderNode-02</span>
+            <span class="chip"><i class="led"></i>RenderNode-03</span>
+            <span class="chip"><i class="led"></i>RenderNode-04</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Pipeline ═════════════════════════════════════════════════ -->
+  <section class="band" id="pipeline">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker grad-text">How it works</div>
+        <h2>The link between your shot list and your render machines.</h2>
+        <p>
+          Nothing sits in the middle but a FastAPI server and a SQLite database. Workers connect
+          over a websocket, claim what they are allowed to claim, and report back as they render.
+        </p>
+      </div>
+
+      <div class="flow">
+        <div class="node">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 6.5h15M4.5 12h15M4.5 17.5h9"/>
+            </svg>
+          </div>
+          <h3>Submit</h3>
+          <p>Batch a shot list directly from the web panel, or POST jobs straight to the API.</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13.5 6.5 20 12l-6.5 5.5"/></svg>
+        </div>
+
+        <div class="node">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7.5c0-1.6 3.6-2.9 8-2.9s8 1.3 8 2.9-3.6 2.9-8 2.9-8-1.3-8-2.9Z"/>
+              <path d="M4 7.5v9c0 1.6 3.6 2.9 8 2.9s8-1.3 8-2.9v-9"/>
+              <path d="M4 12c0 1.6 3.6 2.9 8 2.9s8-1.3 8-2.9"/>
+            </svg>
+          </div>
+          <h3>Queue</h3>
+          <p>Priorities, tags and path maps resolve every job to a sequence, a level and a config.</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13.5 6.5 20 12l-6.5 5.5"/></svg>
+        </div>
+
+        <div class="node">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="7" rx="2"/>
+              <rect x="3" y="13" width="18" height="7" rx="2"/>
+              <path d="M7 7.5h.01M7 16.5h.01"/>
+            </svg>
+          </div>
+          <h3>Dispatch</h3>
+          <p>Idle workers pull the next job for their project, or take only the work assigned to them.</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13.5 6.5 20 12l-6.5 5.5"/></svg>
+        </div>
+
+        <div class="node">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h6l2 2.6h5a2 2 0 0 1 2 2v6.4a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/>
+              <path d="M10.6 11.6v4.3l3.9-2.15Z"/>
+            </svg>
+          </div>
+          <h3>Render</h3>
+          <p>The worker renders the shot with Movie Render Queue on the chosen preset, streaming progress back.</p>
+        </div>
+
+        <div class="arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13.5 6.5 20 12l-6.5 5.5"/></svg>
+        </div>
+
+        <div class="node">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 19.5h15"/>
+              <path d="M7 19.5v-6M12 19.5V6.5M17 19.5v-9"/>
+            </svg>
+          </div>
+          <h3>Report</h3>
+          <p>Every finished job files a report: durations, frame counts, failures, full history.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Features ═════════════════════════════════════════════════ -->
+  <section class="band alt" id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker grad-text">Native to Unreal</div>
+        <h2>Built for Unreal Engine.</h2>
+        <p>
+          Not a generic farm manager with a plugin bolted on. Designed for Unreal Engine: a level
+          sequence, a map and a Movie Render Queue preset, resolved to real content paths and
+          rendered in Unreal on the machine that picks it up.
+        </p>
+      </div>
+
+      <div class="features">
+        <div class="card">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 6.5h15M4.5 12h11M4.5 17.5h7"/>
+              <path d="M18.5 14v6M16 16.5l2.5-2.5 2.5 2.5"/>
+            </svg>
+          </div>
+          <h3>Queue you can steer</h3>
+          <p>Nudge priorities, retry, stop, reassign, bulk-clear. Filter by status, tag, worker or search, then act on the selection.</p>
+        </div>
+
+        <div class="card">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/>
+              <path d="M7 7.5h.01M7 16.5h.01"/>
+            </svg>
+          </div>
+          <h3>Worker fleet</h3>
+          <p>Machines announce themselves with their specs, take distributed work or a fixed assignment, and can be drained or shut down from the browser.</p>
+        </div>
+
+        <div class="card">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 5.5h5.5v5.5H5ZM13.5 13h5.5v5.5h-5.5Z"/>
+              <path d="M10.5 8.2h4.2a1.4 1.4 0 0 1 1.4 1.4v3.4"/>
+            </svg>
+          </div>
+          <h3>Path maps</h3>
+          <p>Maps, scenes and shots keep the real content paths. Rename a naming convention once and every job resolves against the new one.</p>
+        </div>
+
+        <div class="card">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6.5 4.5h11a1.5 1.5 0 0 1 1.5 1.5v13l-7-3.4-7 3.4V6a1.5 1.5 0 0 1 1.5-1.5Z"/>
+              <path d="M9.2 9.2h5.6"/>
+            </svg>
+          </div>
+          <h3>Pipeline presets</h3>
+          <p>Save MRQ configurations as named presets (proxy, HD, 4K, ACES) and pick one per job instead of per artist.</p>
+        </div>
+
+        <div class="card">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 15.5a5.5 5.5 0 0 1 5.5-5.5"/>
+              <path d="M4 19.8a9.8 9.8 0 0 1 9.8-9.8"/>
+              <path d="M4 6.2A13.8 13.8 0 0 1 17.8 20"/>
+              <path d="M19.6 19.9h.01"/>
+            </svg>
+          </div>
+          <h3>Live, without refreshing</h3>
+          <p>Server-sent events push job, worker and progress changes to every open tab, with toasts for the things you need to notice.</p>
+        </div>
+
+        <div class="card">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8"/>
+              <path d="M12 4.2v7.8h7.8"/>
+            </svg>
+          </div>
+          <h3>Reports and history</h3>
+          <p>Success, error and cancelled all file a report. Average render times, status breakdowns and a searchable history of finished renders.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Quickstart ═══════════════════════════════════════════════ -->
+  <section class="band" id="quickstart">
+    <div class="wrap split">
+      <div>
+        <div class="sec-head" style="margin-bottom: 0;">
+          <div class="kicker grad-text">Quickstart</div>
+          <h2>Clone it, run it. That's the install.</h2>
+          <p>
+            The server bootstraps its own virtual environment on first launch, installs its
+            requirements into it, and re-launches itself inside it. Nothing touches your system
+            Python, and there is no bundler in sight.
+          </p>
+        </div>
+
+        <ul class="checks">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            <span><b>Self-contained.</b> Server, UI, settings and databases all live in the one folder.</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            <span><b>FastAPI + SQLite.</b> No external database, no message broker, no cloud account.</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            <span><b>Workers where the licences are.</b> Windows render nodes, with the server free to sit on macOS or Linux.</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            <span><b>Role-gated.</b> Token auth in front of every write, so the queue is not a free-for-all.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="terminal">
+        <div class="bar-top">
+          <div class="lights"><i></i><i></i><i></i></div>
+          <span>renderdeck : bash</span>
+        </div>
+        <pre><span class="c"># start the server (creates ./venv on first run)</span>
+<span class="p">$</span> python3 server.py
+
+<span class="o">[bootstrap] Re-launching inside venv -&gt; ./venv/bin/python
+Starting server...
+✅ Server running. Press Ctrl+C to stop.</span>
+
+<span class="c"># open the UI</span>
+<span class="p">$</span> open http://localhost:6789/
+
+<span class="c"># or kick the tyres with a simulated farm</span>
+<span class="p">$</span> python3 server.py --demo --demo-seed</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Final CTA ════════════════════════════════════════════════ -->
+  <section class="final band alt">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="wrap final-inner">
+      <h2>Put a night's worth of shots in the queue.</h2>
+      <p>
+        Try the live demo, a seeded project with a thousand shots and a simulated render farm,
+        or download it and point it at your own machines.
+      </p>
+      <div class="cta-row">
+        <!-- DEMO link — same target as the one in the hero -->
+        <a class="btn btn-primary" href="http://localhost:6789/">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2c0-.86.94-1.4 1.68-.96l9.1 5.4a1.12 1.12 0 0 1 0 1.93l-9.1 5.4A1.12 1.12 0 0 1 8 15.99Z"/></svg>
+          Demo
+        </a>
+        <!-- DOWNLOAD link — same target as the one in the hero -->
+        <a class="btn btn-ghost" href="https://github.com/zenmastertv/renderdeck/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3.4v11.3M7.4 10.4l4.6 4.6 4.6-4.6M4.4 19.4h15.2"/>
+          </svg>
+          Download
+        </a>
+         <!-- DOWNLOAD link — same target as the one in the hero -->
+        <a class="btn btn-ghost" href="https://github.com/zenmastertv/renderdeck/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 4.4h5.2v5.2M19.2 4.4L10 13.6M15.4 12.8v5.4a1.4 1.4 0 01-1.4 1.4H5.8a1.4 1.4 0 01-1.4-1.4V8a1.4 1.4 0 011.4-1.4h5.4"/>          </svg>
+          Sample
+        </a>       
+      </div>
+      <p class="cta-note line" style="margin-top: 18px;">
+        Sample link contains a minimal example project in Unreal. Please follow the included <code>guide.pdf</code> on how to run it.
+      </p>      
+    </div>
+  </section>
+
+  <!-- ══ Footer ═══════════════════════════════════════════════════ -->
+  <footer>
+    <div class="wrap foot">
+      <a class="brand" href="./">
+        <img class="mark d" src="assets/renderdeck-mark-dark.svg" alt="" width="26" height="26" style="width:26px;height:26px">
+        <img class="mark l" src="assets/renderdeck-mark-light.svg" alt="" width="26" height="26" style="width:26px;height:26px">
+        <div class="wordmark"><span>Render</span><b>Deck</b></div>
+      </a>
+      <a href="http://localhost:6789/">Live demo</a>
+      <a href="https://github.com/zenmastertv/renderdeck/releases/latest">Download</a>
+      <a href="https://github.com/zenmastertv/renderdeck" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+
+      // Theme toggle — shares the rd_theme key with the app.
+      document.getElementById('theme-toggle').addEventListener('click', function () {
+        var dark = !root.classList.contains('dark');
+        root.classList.toggle('dark', dark);
+        root.classList.toggle('light', !dark);
+        localStorage.setItem('rd_theme', dark ? 'dark' : 'light');
+      });
+
+      // ── The queue mock ───────────────────────────────────────────────────
+      // Both in-flight rows render out to their last frame, report Success,
+      // then the panel resets after a beat and takes it from the top.
+      var HOLD = 10000;   // how long the finished queue stays on screen
+
+      var JOBS = [
+        // at:    where the bar starts, as a fraction of the whole render
+        // start: ms into the cycle the job gets picked up (0 = already going)
+        { key: 'a', worker: 'RenderNode-01', preset: 'ACES_4K', at: 0.686, start: 0,    ms: 5000, took: '18m 42s' },
+        // the queued one: RENDER-02 frees up when 'a' lands, and takes it
+        { key: 'b', worker: 'RenderNode-02', preset: 'Proxy',   at: 0,     start: 1000, ms: 4500, took: '4m 12s' }
+      ];
+
+      var rows = JOBS.map(function (job) {
+        var el = document.querySelector('[data-mock="' + job.key + '"]');
+        return el && {
+          job:  job,
+          bar:  el.querySelector('.bar'),
+          fill: el.querySelector('.bar i'),
+          pill: el.querySelector('.pill'),
+          meta: el.querySelector('.meta')
+        };
+      }).filter(Boolean);
+
+      if (rows.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var queued = function (row) {
+          row.bar.classList.add('is-idle');
+          row.fill.style.width = (row.job.at * 100) + '%';
+          row.meta.textContent = row.job.queued;
+          row.pill.className = 'pill queued';
+          row.pill.textContent = 'Queued';
+        };
+
+        var rendering = function (row) {
+          row.bar.classList.remove('is-idle');
+          row.meta.textContent = row.job.worker + ' · ' + row.job.preset;
+          row.pill.className = 'pill render';
+          row.pill.textContent = 'Rendering';
+        };
+
+        var succeeded = function (row) {
+          // Track goes away once the job lands, so a finished row looks like the
+          // one that finished before the page loaded.
+          row.bar.classList.add('is-idle');
+          row.fill.style.width = '100%';
+          row.meta.textContent = row.job.worker + ' · ' + row.job.preset + ' · ' + row.job.took;
+          row.pill.className = 'pill done';
+          row.pill.textContent = 'Success';
+        };
+
+        // the moment the last job in the chain lands
+        var settles = rows.reduce(function (ms, row) {
+          return Math.max(ms, row.job.start + row.job.ms);
+        }, 0);
+
+        var started = null;
+
+        var tick = function (now) {
+          if (started === null) started = now;
+          var elapsed = now - started;
+
+          rows.forEach(function (row) {
+            var t = (elapsed - row.job.start) / row.job.ms;
+            if (t < 0) {
+              if (row.state !== 'queued') { row.state = 'queued'; queued(row); }
+            } else if (t < 1) {
+              if (row.state !== 'rendering') { row.state = 'rendering'; rendering(row); }
+              row.fill.style.width = ((row.job.at + (1 - row.job.at) * t) * 100).toFixed(2) + '%';
+            } else if (row.state !== 'done') {
+              row.state = 'done';
+              succeeded(row);
+            }
+          });
+
+          if (elapsed >= settles + HOLD) {
+            started = null;                       // hold is over: run it again
+            rows.forEach(function (row) { row.state = null; });
+          }
+          requestAnimationFrame(tick);
+        };
+
+        requestAnimationFrame(tick);
+      }
+    })();
+  </script>
+</body>
+</html>
