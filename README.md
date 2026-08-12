@@ -16,12 +16,4 @@ assets/         mark, app icon and favicons
 .nojekyll       serve the files as-is, skip Jekyll processing
 ```
 
-## Working on it
 
-Open `index.html` directly, or serve the folder if you want a real origin:
-
-```bash
-python3 -m http.server 8080
-```
-
-Pushing to `main` republishes the site.
